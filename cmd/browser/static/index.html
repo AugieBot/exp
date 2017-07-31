@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<!--
+Copyright 2017 The Upspin Authors. All rights reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Upspin browser</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+<style>
+.navbar {
+	margin-top: 20px;
+}
+.up-template {
+	visibility: hidden;
+	display: none;
+}
+.up-clickable {
+	cursor: pointer;
+}
+.up-breadcrumb, .up-error, .up-loading {
+	margin: 0;
+}
+</style>
+  </head>
+  <body>
+
+	<div class="container">
+		<div class="navbar navbar-default">
+			<div class="navbar-header">
+				<img class="navbar-brand" src="augie.png">
+			</div>
+			<p class="navbar-text" id="headerUsername"></p>
+		</div>
+		<div class="row up-browser-parent">
+		</div>
+	</div>
+
+<!-- browser template -->
+
+<div class="col-md-6 up-template up-browser">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<div class="pull-right">
+				<button type="button" class="btn btn-default btn-sm up-mkdir">
+					<span class="glyphicon glyphicon-folder-close"></span>
+					&nbsp;
+					Make directory
+				</button>
+				<button type="button" class="btn btn-default btn-sm up-refresh">
+					<span class="glyphicon glyphicon-refresh"></span>
+					&nbsp;
+					Refresh
+				</button>
+			</div>
+			<button type="button" class="btn btn-default btn-sm up-delete">
+				<span class="glyphicon glyphicon-trash"></span>
+				&nbsp;
+				Delete
+			</button>
+			<button type="button" class="btn btn-default btn-sm up-copy">
+				<span class="glyphicon glyphicon-transfer"></span>
+				&nbsp;
+				Copy
+			</button>
+		</div>
+
+		<div class="panel-body">
+			<div class="input-group">
+				<span class="input-group-btn">
+					<button type="button" class="btn btn-default up-parent">
+						<psan class="glyphicon glyphicon-level-up"></span>
+					</button>
+				</span>
+				<input type="text" class="up-path form-control">
+			</div>
+			<div class="alert alert-danger up-error" role="alert">
+				Error message
+			</div>
+			<div class="alert alert-info up-loading" role="alert">
+				Loading...
+			</div>
+		</div>
+
+		<table class="table up-entries">
+			<tr>
+				<th><input type="checkbox" class="up-select-all"></th>
+				<th></th>
+				<th>Name</th>
+				<th>Size</th>
+				<th>Time</th>
+				<th></th>
+			</tr>
+			<tr class="up-template up-entry">
+				<td><input type="checkbox" class="up-entry-select"></td>
+				<td><span class="up-entry-icon glyphicon"></span></td>
+				<td class="up-entry-name"></td>
+				<td class="up-entry-size"></td>
+				<td class="up-entry-time"></td>
+				<td>
+					<button type="button" class="btn btn-default btn-xs up-entry-inspect">
+						<span class="glyphicon glyphicon-info-sign"></span>
+					</button>
+				</td>
+			</tr>
+			<tr class="up-empty">
+				<td colspan="6" class="text-center">The directory is empty.</td>
+			</tr>
+		</table>
+	</div>
+</div>
+
+<!-- loading modal -->
+
+<div class="modal fade up-loading" tabindex="-1" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Performing startup checks...</h4>
+      </div>
+      <div class="modal-body">
+		<p>
+		Please wait while we check the validity of your Upspin account
+		and check connectivity to your directory server.
+		</p>
+		<div class="panel panel-danger up-error">
+			<div class="panel-heading">An error occurred</div>
+			<div class="panel-body"><pre class="up-error-msg"></pre></div>
+		</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- signup modal -->
+
+<div class="modal fade up-signup" tabindex="-1" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Sign up an Upspin user</h4>
+      </div>
+      <div class="modal-body">
+		<p>
+		To use Upspin you must register a user name and public key with
+		the central key server.
+		</p>
+		<p>
+		Your user name is how the Upspin system and its users will
+		identify you and your data. A user name is just an
+		<a href="https://upspin.io/doc/faq.md#email" target="_blank">email address you own</a>
+		during signup. The email address itself is not used by Upspin
+		after signup; it doesn't matter if you lose or delete it later.
+		</p>
+		<div class="form-group">
+			<label for="signupUserName">User Name</label>
+			<input type="email" class="form-control" id="signupUserName" placeholder="Email address">
+		</div>
+		<p>
+		If you know the names of the Directory and Store servers you
+		will use, you may nominate them here. If not, don't worry;
+		you can set them later.
+		</p>
+		<div class="form-group">
+			<label for="singupInputDirServer">Directory Server</label>
+			<input type="text" class="form-control" id="signupDirServer" placeholder="Host name">
+		</div>
+		<div class="form-group">
+			<label for="singupInputDirServer">Store Server</label>
+			<input type="text" class="form-control" id="signupStoreServer" placeholder="Host name">
+		</div>
+		<div class="panel panel-danger up-error">
+			<div class="panel-heading">Error</div>
+			<div class="panel-body up-error-msg"></div>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary">Sign up</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- secretseed modal -->
+
+<div class="modal fade up-secretseed" tabindex="-1" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Write down your secret key</h4>
+      </div>
+      <div class="modal-body">
+		<p>
+		An Upspin key pair was generated for you and stored in this
+		directory on your local machine:
+		</p>
+		<pre id="secretseedKeyDir"></pre>
+		<p>
+		This key pair provides access to your Upspin identity and data.
+		If you lose the keys you can re-create them using this "secret seed":
+		</p>
+		<pre id="secretseedSecretSeed"></pre>
+		<p>
+		<b>Write this down and store it in a secure, private place.
+		Do not share your secret key or this string with anyone.</b>
+		</p>
+		<div class="panel panel-danger up-error">
+			<div class="panel-heading">Error</div>
+			<div class="panel-body up-error-msg"></div>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger">OK, I wrote it down</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- verify modal -->
+
+<div class="modal fade up-verify" tabindex="-1" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Verify your email address</h4>
+      </div>
+      <div class="modal-body">
+		<p>
+		The Upspin key server has sent an email to
+		<b class="up-username"></b>
+		to verify your ownership of that address.
+		</p>
+		<p>
+		To complete the signup process, find that email, click the
+		verification link, and then click the 'Proceed' button.
+		</p>
+		<div class="panel panel-danger up-error">
+			<div class="panel-heading">Error</div>
+			<div class="panel-body up-error-msg"></div>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default up-resend">Re-send verification email</button>
+        <button type="button" class="btn btn-primary up-proceed">Proceed</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- inspector modal -->
+
+<div class="modal fade up-inspector" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Details</h4>
+      </div>
+      <div class="modal-body">
+		<table class="table">
+			<tr>
+				<th>Name</th>
+				<td class="up-entry-name"></td>
+			</tr>
+			<tr>
+				<th>Size</th>
+				<td class="up-entry-size"></td>
+			</tr>
+			<tr>
+				<th>Time</th>
+				<td class="up-entry-time"></td>
+			</tr>
+			<tr>
+				<th>Attributes</th>
+				<td class="up-entry-attr"></td>
+			</tr>
+			<tr>
+				<th>Writer</th>
+				<td class="up-entry-writer"></td>
+			</tr>
+		</table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- delete/copy modal -->
+
+<div class="modal fade up-confirm" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	<h4 class="modal-title">Confirm <span class="up-action"></span></h4>
+      </div>
+      <div class="modal-body">
+	      <p>Recursively <span class="up-action"></span> these paths:</p>
+	      <ul class="up-paths">
+	      </ul>
+	      <div class="up-dest-message">
+	      	<p>to this directory:</p>
+	      	<ul><li class="up-dest"></ul>
+	      </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary up-confirm-button">Confirm</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- mkdir modal -->
+
+<div class="modal fade up-mkdir" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	<h4 class="modal-title">Make directory</h4>
+      </div>
+      <div class="modal-body">
+	<form>
+		<div class="form-group">
+			<input type="text" class="form-control up-path" placeholder="Upspin path">
+		</div>
+	</form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary up-mkdir-button">Make directory</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
